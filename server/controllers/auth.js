@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const { registerEmailParams } = require("../helpers/email");
 const shortId = require("shortid");
+const expressJwt = require("express-jwt");
 
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -113,6 +114,52 @@ exports.login = async (req, res) => {
     console.error(err);
     return res.status(500).json({
       error: "Internal server error. Please try again later.",
+    });
+  }
+};
+
+exports.requireSignin = expressJwt({ secret: process.env.JWT_SECRET });
+
+exports.authMiddleware = async (req, res, next) => {
+  try { 
+    const authUserId = req.user._id;
+    const user = await User.findById(authUserId);
+
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found",
+      });
+    }
+
+    req.profile = user;
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      error: "Server error",
+    });
+  }
+};
+
+// Admin Middleware
+exports.adminMiddleware = async (req, res, next) => {
+  try {
+    const adminUserId = req.user._id;
+    const user = await User.findById(adminUserId);
+    if (!user) {
+      return res.status(400).json({
+        error: "User not found",
+      });
+    }
+    if (user.role !== "admin") {
+      return res.status(400).json({
+        error: "Admin resource. Access denied",
+      });
+    }
+    req.profile = user;
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      error: "Server error",
     });
   }
 };
