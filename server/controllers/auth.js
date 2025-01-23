@@ -1,7 +1,10 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const { registerEmailParams } = require("../helpers/email");
+const {
+  registerEmailParams,
+  forgotPasswordEmailParams,
+} = require("../helpers/email");
 const shortId = require("shortid");
 const expressJwt = require("express-jwt");
 
@@ -121,7 +124,7 @@ exports.login = async (req, res) => {
 exports.requireSignin = expressJwt({ secret: process.env.JWT_SECRET });
 
 exports.authMiddleware = async (req, res, next) => {
-  try { 
+  try {
     const authUserId = req.user._id;
     const user = await User.findById(authUserId);
 
@@ -162,4 +165,45 @@ exports.adminMiddleware = async (req, res, next) => {
       error: "Server error",
     });
   }
+};
+
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
+      return res.status(400).json({
+        error: "User with that email does not exist",
+      });
+    }
+    const token = jwt.sign(
+      { name: user.name },
+      process.env.JWT_RESET_PASSWORD,
+      { expiresIn: "10m" }
+    );
+    const params = forgotPasswordEmailParams(email, token);
+    await user.updateOne({ resetPasswordLink: token });
+    try {
+      const sendEmail = ses.sendEmail(params).promise();
+      await sendEmail;
+      console.log("SES reset password success");
+      return res.json({
+        message: `Email has been sent to ${email}. Click on the link to reset your password.`,
+      });
+    } catch (emailError) {
+      console.log("SES reset password failed", emailError);
+      return res.status(500).json({
+        message: `We could not send the email. Please try again later.`,
+      });
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(500).json({
+      error: "Password reset failed. Please try again later.",
+    });
+  }
+};
+
+exports.resetPassword = (req, res) => {
+  //
 };
