@@ -92,6 +92,9 @@ const Login = () => {
         {success && showSuccessMessage(success)}
         {error && showErrorMessage(error)}
         {loginForm()}
+        <Link href="/auth/password/forgot" className="text-danger float-right">
+          Forgot Password
+        </Link>
       </div>
     </Layout>
   );
