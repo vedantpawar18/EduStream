@@ -7,6 +7,7 @@ const {
 } = require("../helpers/email");
 const shortId = require("shortid");
 const expressJwt = require("express-jwt");
+const _ = require("lodash");
 
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -183,27 +184,52 @@ exports.forgotPassword = async (req, res) => {
     );
     const params = forgotPasswordEmailParams(email, token);
     await user.updateOne({ resetPasswordLink: token });
-    try {
-      const sendEmail = ses.sendEmail(params).promise();
-      await sendEmail;
-      console.log("SES reset password success");
-      return res.json({
-        message: `Email has been sent to ${email}. Click on the link to reset your password.`,
-      });
-    } catch (emailError) {
-      console.log("SES reset password failed", emailError);
-      return res.status(500).json({
-        message: `We could not send the email. Please try again later.`,
-      });
-    }
+    const sendEmailCommand = new SendEmailCommand(params);
+    const data = await sesClient.send(sendEmailCommand);
+    console.log("Email submitted to SES", data);
+    res.json({
+      message: `Email has been sent to ${email}. Follow the instructions to reset your password.`,
+    });
   } catch (error) {
-    console.error("Forgot password error:", error);
-    return res.status(500).json({
-      error: "Password reset failed. Please try again later.",
+    console.log("Error during password reset:", error);
+    res.status(500).json({
+      message:
+        "We could not process your password reset. Please try again later.",
     });
   }
 };
 
-exports.resetPassword = (req, res) => {
-  //
+exports.resetPassword = async (req, res) => {
+  const { resetPasswordLink, newPassword } = req.body;
+
+  if (!resetPasswordLink || !newPassword) {
+    return res
+      .status(400)
+      .json({ error: "Reset link or new password is missing." });
+  }
+
+  try {
+    const decoded = await jwt.verify(
+      resetPasswordLink,
+      process.env.JWT_RESET_PASSWORD
+    );
+
+    const user = await User.findOne({ resetPasswordLink }).exec();
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or expired token. Try again." });
+    }
+    user.password = newPassword;
+    user.resetPasswordLink = "";
+
+    await user.save();
+    return res.json({
+      message: "Great! Now you can login with your new password.",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ error: "Password reset failed. Try again." });
+  }
 };
