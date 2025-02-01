@@ -1,123 +1,148 @@
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import Resizer from "react-image-file-resizer";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import { API } from "../../../config";
 import { showSuccessMessage, showErrorMessage } from "../../../helpers/alerts";
 import Layout from "../../../components/Layout";
 import withAdmin from "../../withAdmin";
+import "react-quill/dist/quill.bubble.css";
 
 const Create = ({ user, token }) => {
   const [state, setState] = useState({
     name: "",
-    content: "",
     error: "",
     success: "",
-    formData: process.browser ? new FormData() : null,
     buttonText: "Create",
-    imageUploadText: "Upload Image",
+    image: "",
   });
+  const [content, setContent] = useState("");
+  const [imageUploadButtonName, setImageUploadButtonName] =
+    useState("Upload image");
 
-  const {
-    name,
-    content,
-    success,
-    error,
-    formData,
-    buttonText,
-    imageUploadText,
-  } = state;
+  const { name, success, error, image, buttonText } = state;
 
   const handleChange = (name) => (e) => {
-    const value = name === "image" ? e.target.files[0] : e.target.value;
-    const imageName =
-      name === "image" ? e.target.files[0]?.name : "Upload Image";
-    formData.set(name, value);
-    setState({
-      ...state,
-      [name]: value,
-      error: "",
-      success: "",
-      imageUploadText: imageName,
-    });
+    setState({ ...state, [name]: e.target.value, error: "", success: "" });
+  };
+
+  const handleContent = (e) => {
+    setContent(e);
+    setState({ ...state, success: "", error: "" });
+  };
+
+  const handleImage = (event) => {
+    let fileInput = false;
+    if (event.target.files[0]) {
+      fileInput = true;
+    }
+    setImageUploadButtonName(event.target.files[0].name);
+    if (fileInput) {
+      Resizer.imageFileResizer(
+        event.target.files[0],
+        300,
+        300,
+        "JPEG",
+        100,
+        0,
+        (uri) => {
+          setState({ ...state, image: uri, success: "", error: "" });
+        },
+        "base64"
+      );
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setState({ ...state, buttonText: "Creating..." });
-
+    setState({ ...state, buttonText: "Creating" });
     try {
-      const response = await axios.post(`${API}/category`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const response = await axios.post(
+        `${API}/category`,
+        { name, content, image },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setImageUploadButtonName("Upload image");
       setState({
         ...state,
         name: "",
         content: "",
-        formData: new FormData(),
+        image: "",
         buttonText: "Created",
-        imageUploadText: "Upload Image",
-        success: `${response.data.name} has been created successfully!`,
+        success: `${response.data.name} is created`,
       });
-    } catch (err) {
+    } catch (error) {
       setState({
         ...state,
         buttonText: "Create",
-        error: err.response?.data?.error || "An error occurred. Please try again.",
+        error: error.response?.data?.error || "Something went wrong",
       });
     }
   };
 
   const createCategoryForm = () => (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow-sm">
-      <div className="form-group mb-3">
-        <label className="text-muted">Name</label>
+    <form onSubmit={handleSubmit}>
+      <div className="form-group mb-4">
+        <label className="text-muted">Category Name</label>
         <input
           onChange={handleChange("name")}
           value={name}
           type="text"
-          className="form-control"
-          required
+          className="form-control input-lg rounded-3 shadow-sm"
           placeholder="Enter category name"
-        />
-      </div>
-      <div className="form-group mb-3">
-        <label className="text-muted">Content</label>
-        <textarea
-          onChange={handleChange("content")}
-          value={content}
-          className="form-control"
           required
-          placeholder="Enter category description"
         />
       </div>
-      <div className="form-group mb-3">
-        <label className="btn btn-outline-secondary w-100 text-center">
-          {imageUploadText}
+      <div className="form-group mb-4">
+        <label className="text-muted">Category Content</label>
+        <ReactQuill
+          value={content}
+          onChange={handleContent}
+          placeholder="Write something..."
+          theme="bubble"
+          className="pb-5 mb-3"
+          style={{ border: "1px solid #666", borderRadius: "8px" }}
+        />
+      </div>
+      <div className="form-group mb-4">
+        <label className="btn btn-outline-secondary rounded-3 p-3 shadow-sm">
           <input
-            onChange={handleChange("image")}
+            onChange={handleImage}
             type="file"
             accept="image/*"
             className="form-control"
             hidden
           />
+          {imageUploadButtonName}
         </label>
       </div>
       <div>
-        <button type="submit" className="btn btn-primary w-100">{buttonText}</button>
+        <button className="btn btn-warning btn-block rounded-3 shadow-lg">
+          {buttonText}
+        </button>
       </div>
     </form>
   );
 
   return (
     <Layout>
-      <div className="row">
-        <div className="col-md-8 offset-md-2">
-          <h1 className="text-center mb-4">Create Category</h1>
-          {success && showSuccessMessage(success)}
-          {error && showErrorMessage(error)}
-          {createCategoryForm()}
+      <div className="container mt-5">
+        <div className="row justify-content-center">
+          <div className="col-md-8">
+            <h1 className="font-weight-bold text-center text-primary mb-4">
+              Create Category
+            </h1>
+
+            {success && showSuccessMessage(success)}
+            {error && showErrorMessage(error)}
+
+            {createCategoryForm()}
+          </div>
         </div>
       </div>
     </Layout>

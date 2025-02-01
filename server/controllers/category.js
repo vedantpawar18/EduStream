@@ -13,65 +13,58 @@ const s3 = new S3Client({
   },
 });
 
-exports.create = (req, res) => {
-  let form = new formidable.IncomingForm();
+exports.create = async (req, res) => {
+  const { name, image, content } = req.body;
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(400).json({ error: "Image could not upload" });
-    }
-    let {
-      name: [name],
-      content: [content],
-    } = fields;
+  if (!name || !image || !content) {
+    return res
+      .status(400)
+      .json({ error: "Name, image, and content are required" });
+  }
+  const base64Data = Buffer.from(
+    image.replace(/^data:image\/\w+;base64,/, ""),
+    "base64"
+  );
+  const type = image.split(";")[0].split("/")[1];
 
-    const { image } = files;
+  const slug = slugify(name);
+  let category = new Category({ name, content, slug });
 
-    if (!image || image.length === 0) {
-      return res.status(400).json({ error: "Image is required" });
-    }
+  const imageSize = base64Data.length;
+  if (imageSize > 2000000) {
+    return res.status(400).json({ error: "Image should be less than 2MB" });
+  }
 
-    const imagePath = image[0].filepath;
-    const imageType = image[0].mimetype || "image/jpg";
-    const imageSize = image[0].size;
+  const imageKey = `category/${uuidv4()}.${type}`;
 
-    if (imageSize > 2000000) {
-      return res.status(400).json({ error: "Image should be less than 2MB" });
-    }
+  const params = {
+    Bucket: "myextendedbucket",
+    Key: imageKey,
+    Body: base64Data,
+    ACL: "public-read",
+    ContentEncoding: "base64",
+    ContentType: `image/${type}`,
+  };
 
-    const slug = slugify(name);
+  try {
+    const command = new PutObjectCommand(params);
+    const data = await s3.send(command);
+    console.log("AWS Upload Response:", data);
 
-    let category = new Category({ name, content, slug });
-
-    const imageKey = `category/${uuidv4()}`;
-
-    const params = {
-      Bucket: "myextendedbucket",
-      Key: imageKey,
-      Body: fs.createReadStream(imagePath),
-      ContentType: imageType,
-      ACL: "public-read",
+    category.image = {
+      url: `https://myextendedbucket.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${imageKey}`,
+      key: imageKey,
     };
+    category.postedBy = req.user._id;
 
-    try {
-      const command = new PutObjectCommand(params);
-      const data = await s3.send(command);
-
-      console.log("AWS UPLOAD RES DATA", data);
-
-      category.image = {
-        url: `https://myextendedbucket.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${imageKey}`, // Use the same imageKey
-        key: imageKey,
-      };
-      const savedCategory = await category.save();
-      return res.json(savedCategory);
-    } catch (err) {
-      console.log("S3 Upload or DB save error:", err);
-      return res
-        .status(400)
-        .json({ error: "Upload to S3 or saving to DB failed" });
-    }
-  });
+    const savedCategory = await category.save();
+    return res.json(savedCategory);
+  } catch (err) {
+    console.error("Error uploading image to S3 or saving to DB:", err);
+    return res
+      .status(400)
+      .json({ error: "Failed to upload image or save category" });
+  }
 };
 
 exports.list = async (req, res) => {
@@ -79,7 +72,7 @@ exports.list = async (req, res) => {
     const data = await Category.find({});
     res.json(data);
   } catch (err) {
-    console.error(err);  
+    console.error(err);
     return res.status(400).json({
       error: "Categories could not be loaded. Please try again later.",
     });
