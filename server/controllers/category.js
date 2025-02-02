@@ -1,4 +1,5 @@
 const Category = require("../models/category");
+const Link = require("../models/link");
 const slugify = require("slugify");
 const formidable = require("formidable");
 const { v4: uuidv4 } = require("uuid");
@@ -77,11 +78,32 @@ exports.list = async (req, res) => {
       error: "Categories could not be loaded. Please try again later.",
     });
   }
+}; 
+
+exports.read = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const limit = parseInt(req.body.limit) || 10;
+    const skip = parseInt(req.body.skip) || 0; 
+    const category = await Category.findOne({ slug }).populate('postedBy', '_id name username');
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    } 
+    const links = await Link.find({ categories: category })
+      .populate('postedBy', '_id name username')
+      .populate('categories', 'name')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(skip);
+ 
+    res.json({ category, links });
+
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "An error occurred while fetching category and links" });
+  }
 };
 
-exports.read = (req, res) => {
-  //
-};
 
 exports.update = (req, res) => {
   //
