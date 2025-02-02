@@ -7,7 +7,7 @@ const Home = ({ categories }) => {
   const listCategories = () =>
     categories.map((c, i) => (
       <div className="col-md-4 mb-4" key={i}>
-        <Link href="/" passHref>
+        <Link href={`/links/${c.slug}`} passHref>
           <div className="card shadow-lg border-0 rounded-lg overflow-hidden hover-card">
             <div className="card-body p-3">
               <div className="row">
