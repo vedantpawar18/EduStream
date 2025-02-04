@@ -13,22 +13,10 @@ const Links = ({
   linkSkip,
 }) => {
   const [allLinks, setAllLinks] = useState(initialLinks);
+  const [limit, setLimit] = useState(linksLimit);
+  const [skip, setSkip] = useState(linkSkip);
+  const [size, setSize] = useState(totalLinks);
   const [loading, setLoading] = useState(false);
-
-  const loadMoreLinks = async () => {
-    setLoading(true);
-    const newSkip = allLinks.length;
-    try {
-      const response = await axios.post(`${API}/category/${query.slug}`, {
-        skip: newSkip,
-        limit: linksLimit,
-      });
-      setAllLinks((prevLinks) => [...prevLinks, ...response.data.links]);
-    } catch (err) {
-      console.error("Error loading more links", err);
-    }
-    setLoading(false);
-  };
 
   const listOfLinks = () =>
     allLinks.map((l) => (
@@ -59,6 +47,35 @@ const Links = ({
       </div>
     ));
 
+  const loadMoreLinks = async () => {
+    setLoading(true);
+    let toSkip = skip + limit;
+    try {
+      const response = await axios.post(`${API}/category/${query.slug}`, {
+        skip: toSkip,
+        limit: limit,
+      });
+      setAllLinks((prevLinks) => [...prevLinks, ...response.data.links]);
+      setSize(response.data.links.length);
+      setSkip(toSkip);
+    } catch (err) {
+      console.error("Error loading more links", err);
+    }
+    setLoading(false);
+  };
+
+  const loadMoreButton = () => {
+    return size > 0 && size >= limit ? (
+      <button
+        onClick={loadMoreLinks}
+        className="btn btn-outline-primary"
+        disabled={loading}
+      >
+        {loading ? "Loading..." : "Load More"}
+      </button>
+    ) : null;
+  };
+
   return (
     <Layout>
       <div className="row">
@@ -88,34 +105,26 @@ const Links = ({
         </div>
       </div>
 
-      {allLinks.length < totalLinks && (
-        <div className="text-center">
-          <button
-            className="btn btn-outline-primary"
-            onClick={loadMoreLinks}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Load More"}
-          </button>
-        </div>
-      )}
+      <div className="text-center pt-4 pb-5">{loadMoreButton()}</div>
     </Layout>
   );
 };
 
 Links.getInitialProps = async ({ query, req }) => {
-  const skip = 0;
-  const limit = 2;
+  let skip = 0;
+  let limit = 2;
+
   try {
     const response = await axios.post(`${API}/category/${query.slug}`, {
       skip,
       limit,
     });
+
     return {
       query,
       category: response.data.category,
       initialLinks: response.data.links,
-      totalLinks: response.data.totalLinks,
+      totalLinks: response.data.links.length,
       linksLimit: limit,
       linkSkip: skip,
     };
