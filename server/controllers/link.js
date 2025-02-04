@@ -57,3 +57,20 @@ exports.update = (req, res) => {
 exports.remove = (req, res) => {
   //
 };
+
+exports.clickCount = async (req, res) => {
+  const { linkId } = req.body;
+  try {
+    const result = await Link.findByIdAndUpdate(
+      linkId,
+      { $inc: { clicks: 1 } },
+      { upsert: true, new: true }
+    );
+    return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({
+      error: "Could not update view count",
+    });
+  }
+};
