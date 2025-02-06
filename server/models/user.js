@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const { ObjectId } = mongoose.Schema;
 
 const userSchema = new mongoose.Schema(
   {
@@ -40,6 +41,13 @@ const userSchema = new mongoose.Schema(
         default: "",
       },
     },
+    categories: [
+      {
+        type: ObjectId,
+        ref: "Category",
+        required: true,
+      },
+    ],
   },
   { timestamps: true }
 );

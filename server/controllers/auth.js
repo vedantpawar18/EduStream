@@ -8,7 +8,7 @@ const {
 const shortId = require("shortid");
 const expressJwt = require("express-jwt");
 const _ = require("lodash");
-const Link = require('../models/link');
+const Link = require("../models/link");
 
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -19,7 +19,7 @@ const sesClient = new SESClient({
 });
 
 exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, categories } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { name, email, password },
+      { name, email, password, categories },
       process.env.JWT_ACCOUNT_ACTIVATION,
       {
         expiresIn: "10m",
@@ -52,33 +52,49 @@ exports.register = async (req, res) => {
 };
 
 exports.registerActivate = async (req, res) => {
-  const { token } = req.body;
-
   try {
-    // Verify the JWT token
+    const { token } = req.body;
+
     const decoded = jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION);
-    const { name, email, password } = decoded;
+
+    const { name, email, password, categories } = decoded;
     const username = shortId.generate();
 
-    // Check if user already exists
-    const user = await User.findOne({ email }).exec(); // Using await to handle promise
-    if (user) {
-      return res.status(401).json({
-        error: "Email is taken",
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({
+        error: "Email is already taken",
       });
     }
 
-    // Register new user
-    const newUser = new User({ username, name, email, password });
-    await newUser.save(); // Using await to handle promise
+    const newUser = new User({
+      username,
+      name,
+      email,
+      password,
+      categories,
+    });
+
+    const savedUser = await newUser.save();
+
     return res.json({
       message: "Registration success. Please login.",
     });
-  } catch (err) {
-    console.error(err);
-    return res.status(401).json({
-      error:
-        "Error with the activation link or saving user in database. Try later",
+  } catch (error) {
+    console.error("Error during registration activation:", error);
+
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return res.status(401).json({
+        error: "Expired or invalid link. Please try again.",
+      });
+    }
+
+    return res.status(500).json({
+      error: "Error during registration. Please try again later.",
     });
   }
 };
@@ -87,30 +103,26 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user by email
-    const user = await User.findOne({ email }).exec(); // Use await for the async query
+    const user = await User.findOne({ email }).exec();
     if (!user) {
       return res.status(400).json({
         error: "User with that email does not exist. Please register.",
       });
     }
 
-    // Authenticate user (check password)
-    const isMatch = await user.authenticate(password); // Ensure authenticate is async
+    const isMatch = await user.authenticate(password);
     if (!isMatch) {
       return res.status(400).json({
         error: "Email and password do not match",
       });
     }
 
-    // Generate token
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 
     const { _id, name, role } = user;
 
-    // Send response with token and user data
     return res.json({
       token,
       user: { _id, name, email, role },
