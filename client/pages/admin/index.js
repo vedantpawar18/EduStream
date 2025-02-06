@@ -32,6 +32,14 @@ const Admin = ({ user }) => (
                     <FaCog className="me-2" />All Categories
                   </Link>
                 </li>
+                <li className="nav-item mb-3">
+                  <Link
+                    href="/admin/link/read"
+                    className="nav-link d-flex align-items-center"
+                  >
+                    <FaCog className="me-2" />All Links
+                  </Link>
+                </li>
               </ul>
             </nav>
           </div>

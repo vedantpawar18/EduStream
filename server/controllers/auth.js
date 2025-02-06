@@ -8,6 +8,7 @@ const {
 const shortId = require("shortid");
 const expressJwt = require("express-jwt");
 const _ = require("lodash");
+const Link = require('../models/link');
 
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -231,5 +232,35 @@ exports.resetPassword = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(400).json({ error: "Password reset failed. Try again." });
+  }
+};
+
+exports.canUpdateDeleteLink = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const link = await Link.findById(id);
+
+    if (!link) {
+      return res.status(400).json({
+        error: "Link not found",
+      });
+    }
+
+    const authorizedUser =
+      link.postedBy._id.toString() === req.user._id.toString();
+
+    if (!authorizedUser) {
+      return res.status(403).json({
+        error: "You are not authorized to perform this action",
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while verifying authorization",
+    });
   }
 };

@@ -30,19 +30,23 @@ exports.create = async (req, res) => {
 };
 
 exports.list = async (req, res) => {
-  try {
-    const links = await Link.find().exec();
-
-    if (!links || links.length === 0) {
-      return res.status(404).json({ error: "No links found" });
-    }
-
-    res.status(200).json(links);
+  try { 
+    const limit = req.body.limit ? parseInt(req.body.limit) : 10;
+    const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+ 
+    const links = await Link.find({})
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+ 
+    return res.json(links);
   } catch (err) {
-    console.error("Error fetching links:", err);
-    res
-      .status(500)
-      .json({ error: "Could not list links, please try again later" });
+    console.error(err);
+    return res.status(400).json({
+      error: "Could not list links",
+    });
   }
 };
 
