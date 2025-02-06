@@ -46,16 +46,59 @@ exports.list = async (req, res) => {
   }
 };
 
-exports.read = (req, res) => {
-  //
+exports.read = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const link = await Link.findById(id);
+
+    if (!link) {
+      return res.status(404).json({ error: "Link not found" });
+    }
+
+    return res.json(link);
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ error: "Error finding link" });
+  }
 };
 
-exports.update = (req, res) => {
-  //
+exports.update = async (req, res) => {
+  const { id } = req.params;
+  const { title, url, categories, type, medium } = req.body;
+  const updatedLink = { title, url, categories, type, medium };
+
+  try {
+    const updated = await Link.findByIdAndUpdate(id, updatedLink, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: "Link not found" });
+    }
+
+    return res.json(updated);
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ error: "Error updating the link" });
+  }
 };
 
-exports.remove = (req, res) => {
-  //
+exports.remove = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const data = await Link.findOneAndDelete(id);
+
+    if (!data) {
+      return res.status(404).json({ error: "Link not found" });
+    }
+
+    res.json({ message: "Link removed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Error removing the link" });
+  }
 };
 
 exports.clickCount = async (req, res) => {
