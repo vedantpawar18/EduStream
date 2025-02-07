@@ -1,20 +1,26 @@
 const Link = require("../models/link");
-const slugify = require("slugify");
+const User = require("../models/user");
+const Category = require("../models/category");
+const { linkPublishedParams } = require("../helpers/email");
+const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+
+const sesClient = new SESClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 exports.create = async (req, res) => {
-  try {
-    console.log("called");
-    const { title, url, categories, type, medium } = req.body;
-    const existingLink = await Link.findOne({ url });
-    if (existingLink) {
-      return res.status(400).json({ error: "Link already exists" });
-    }
-    const slug = url;
+  const { title, url, categories, type, medium } = req.body;
+  const slug = url;
 
+  try {
     const newLink = new Link({
       title,
       url,
-      categories: categories,
+      categories,
       type,
       medium,
       slug,
@@ -22,25 +28,47 @@ exports.create = async (req, res) => {
     });
 
     const savedLink = await newLink.save();
-    res.status(201).json(savedLink);
-  } catch (err) {
-    console.error("Error creating link:", err);
-    res.status(500).json({ error: "Server error, please try again later" });
+    res.json(savedLink);
+
+    const users = await User.find({ categories: { $in: categories } }).exec();
+
+    const categoryDetails = await Category.find({
+      _id: { $in: categories },
+    }).exec();
+
+    savedLink.categories = categoryDetails;
+
+    for (const user of users) {
+      const params = linkPublishedParams(user.email, savedLink);
+
+      try {
+        const sendEmailCommand = new SendEmailCommand(params);
+        const emailResult = await sesClient.send(sendEmailCommand);
+        console.log("Email sent successfully:", emailResult);
+      } catch (error) {
+        console.error("Error sending email to", user.email, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error creating link or sending emails:", error);
+    return res.status(400).json({
+      error: "Failed to create link or send notifications.",
+    });
   }
 };
 
 exports.list = async (req, res) => {
-  try { 
+  try {
     const limit = req.body.limit ? parseInt(req.body.limit) : 10;
     const skip = req.body.skip ? parseInt(req.body.skip) : 0;
- 
+
     const links = await Link.find({})
       .populate("postedBy", "name")
       .populate("categories", "name slug")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
- 
+
     return res.json(links);
   } catch (err) {
     console.error(err);
