@@ -4,7 +4,7 @@ import Router from 'next/router';
 import axios from 'axios';
 import { showSuccessMessage, showErrorMessage } from '../../../helpers/alerts';
 import { API } from '../../../config';
-import { isAuth } from '../../../helpers/auth';
+import { isAuth, updateUser } from '../../../helpers/auth';
 import withUser from '../../withUser';
 
 const Profile = ({ user, token }) => {
@@ -85,10 +85,12 @@ const Profile = ({ user, token }) => {
                 }
             );
             console.log(response);
-            setState({
-                ...state,
-                buttonText: 'Updated',
-                success: 'Profile updated successfully'
+            updateUser(response.data, () => {
+                setState({
+                    ...state,
+                    buttonText: 'Updated',
+                    success: 'Profile updated successfully'
+                });
             });
         } catch (error) {
             console.log(error);

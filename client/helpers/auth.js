@@ -20,11 +20,13 @@ export const removeCookie = (key) => {
 // get from cookie such as stored token
 // will be useful when we need to make request to server with auth token
 export const getCookie = (key, req) => {
-  return process.browser ? getCookieFromBrowser(key) : getCookieFromServer(key, req);
+  return process.browser
+    ? getCookieFromBrowser(key)
+    : getCookieFromServer(key, req);
 };
 
 export const getCookieFromBrowser = (key) => {
-  return cookie.get(key);  
+  return cookie.get(key);
 };
 
 export const getCookieFromServer = (key, req) => {
@@ -32,10 +34,10 @@ export const getCookieFromServer = (key, req) => {
 
   if (!cookieHeader) return undefined;
 
-  const cookies = new URLSearchParams(cookieHeader.replace(/; /g, '&'));
+  const cookies = new URLSearchParams(cookieHeader.replace(/; /g, "&"));
   const tokenValue = cookies.get(key);
 
-  console.log('getCookieFromServer', tokenValue); // Optional for debugging
+  console.log("getCookieFromServer", tokenValue); // Optional for debugging
 
   return tokenValue;
 };
@@ -77,4 +79,15 @@ export const logout = () => {
   removeCookie("token");
   removeLocalStorage("user");
   Router.push("/login");
+};
+
+export const updateUser = (user, next) => {
+  if (process.browser) {
+    if (localStorage.getItem("user")) {
+      let auth = JSON.parse(localStorage.getItem("user"));
+      auth = user;
+      localStorage.setItem("user", JSON.stringify(auth));
+      next();
+    }
+  }
 };
