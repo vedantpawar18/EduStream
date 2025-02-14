@@ -18,6 +18,17 @@ const Links = ({
   const [skip, setSkip] = useState(linkSkip);
   const [size, setSize] = useState(totalLinks);
   const [loading, setLoading] = useState(false);
+  const [popular, setPopular] = useState([]);
+
+  useEffect(() => {
+    loadPopular();
+  }, []);
+
+  const loadPopular = async () => {
+    const response = await axios.get(`${API}/link/popular/${category.slug}`);
+    // console.log(response);
+    setPopular(response.data);
+  };
 
   const handleClick = async (linkId) => {
     const response = await axios.put(`${API}/click-count`, { linkId });
@@ -31,33 +42,35 @@ const Links = ({
 
   const listOfLinks = () =>
     allLinks.map((l, i) => (
-        <div key={i} className="row alert alert-primary p-2">
-            <div className="col-md-8" onClick={e => handleClick(l._id)}>
-                <a href={l.url} target="_blank">
-                    <h5 className="pt-2">{l.title}</h5>
-                    <h6 className="pt-2 text-danger" style={{ fontSize: '12px' }}>
-                        {l.url}
-                    </h6>
-                </a>
-            </div>
-            <div className="col-md-4 pt-2">
-                <span className="pull-right">
-                    {moment(l.createdAt).fromNow()} by {l.postedBy.name}
-                </span>
-                <br />
-                <span className="badge text-secondary pull-right">{l.clicks} clicks</span>
-            </div>
-            <div className="col-md-12">
-                <span className="badge text-dark">
-                    {l.type} / {l.medium}
-                </span>
-                {l.categories.map((c, i) => (
-                    <span key={i} className="badge text-success">
-                        {c.name}
-                    </span>
-                ))}
-            </div>
+      <div key={i} className="row alert alert-primary p-2">
+        <div className="col-md-8" onClick={(e) => handleClick(l._id)}>
+          <a href={l.url} target="_blank">
+            <h5 className="pt-2">{l.title}</h5>
+            <h6 className="pt-2 text-danger" style={{ fontSize: "12px" }}>
+              {l.url}
+            </h6>
+          </a>
         </div>
+        <div className="col-md-4 pt-2">
+          <span className="pull-right">
+            {moment(l.createdAt).fromNow()} by {l.postedBy.name}
+          </span>
+          <br />
+          <span className="badge text-secondary pull-right">
+            {l.clicks} clicks
+          </span>
+        </div>
+        <div className="col-md-12">
+          <span className="badge text-dark">
+            {l.type} / {l.medium}
+          </span>
+          {l.categories.map((c, i) => (
+            <span key={i} className="badge text-success">
+              {c.name}
+            </span>
+          ))}
+        </div>
+      </div>
     ));
 
   const loadMore = async () => {
@@ -76,6 +89,40 @@ const Links = ({
     }
     setLoading(false);
   };
+
+  const listOfPopularLinks = () =>
+    popular.map((l, i) => (
+      <div key={i} className="row alert alert-secondary p-2">
+        <div className="col-md-8" onClick={() => handleClick(l._id)}>
+          <a href={l.url} target="_blank">
+            <h5 className="pt-2">{l.title}</h5>
+            <h6 className="pt-2 text-danger" style={{ fontSize: "12px" }}>
+              {l.url}
+            </h6>
+          </a>
+        </div>
+
+        <div className="col-md-4 pt-2">
+          <span className="pull-right">
+            {moment(l.createdAt).fromNow()} by {l.postedBy.name}
+          </span>
+        </div>
+
+        <div className="col-md-12">
+          <span className="badge text-dark">
+            {l.type} {l.medium}
+          </span>
+          {l.categories.map((c, i) => (
+            <span key={i} className="badge text-success">
+              {c.name}
+            </span>
+          ))}
+          <span className="badge text-secondary pull-right">
+            {l.clicks} clicks
+          </span>
+        </div>
+      </div>
+    ));
 
   return (
     <Layout>
@@ -107,7 +154,7 @@ const Links = ({
           <div className="col-md-8">{listOfLinks()}</div>
           <div className="col-md-4">
             <h2 className="lead">Most popular in {category.name}</h2>
-            <p>show popular links</p>
+            <div className="p-3">{listOfPopularLinks()}</div>
           </div>
         </div>
       </InfiniteScroll>
