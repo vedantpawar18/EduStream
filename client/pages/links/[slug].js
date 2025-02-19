@@ -4,7 +4,7 @@ import Head from "next/head";
 import axios from "axios";
 import moment from "moment";
 import { API, APP_NAME } from "../../config";
-import InfiniteScroll from "react-infinite-scroller"; 
+import InfiniteScroll from "react-infinite-scroller";
 
 const Links = ({
   query,
@@ -20,22 +20,16 @@ const Links = ({
   const [size, setSize] = useState(totalLinks);
   const [loading, setLoading] = useState(false);
   const [popular, setPopular] = useState([]);
-  console.log("category", category)
 
   const stripHTML = (data) => data.replace(/<\/?[^>]+(>|$)/g, "");
 
   const head = () => (
     <Head>
-      {/* Title with dynamic category name */}
       <title>{`${category.name} | ${APP_NAME}`}</title>
-  
-      {/* Meta description for better search engine results */}
       <meta
         name="description"
-        content={stripHTML(category.content.substring(0, 160))} 
+        content={stripHTML(category.content.substring(0, 160))}
       />
-  
-      {/* Open Graph meta tags for social media optimization */}
       <meta property="og:title" content={`${category.name} | ${APP_NAME}`} />
       <meta
         property="og:description"
@@ -46,8 +40,6 @@ const Links = ({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:type" content="website" />
-  
-      {/* Twitter Card meta tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={`${category.name} | ${APP_NAME}`} />
       <meta
@@ -56,32 +48,16 @@ const Links = ({
       />
       <meta name="twitter:image" content={category.image.url} />
       <meta name="twitter:creator" content="@YourTwitterHandle" />
-  
-      {/* Structured data for better SERP (Search Engine Results Page) integration */}
-      {/* <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: category.name,
-            description: stripHTML(category.content.substring(0, 160)),
-            image: category.image.url,
-            mainEntityOfPage: `${APP_URL}/${category.slug}`,
-          }),
-        }}
-      />  */}
       <meta name="viewport" content="width=device-width, initial-scale=1" />
     </Head>
   );
-  
+
   useEffect(() => {
     loadPopular();
   }, []);
 
   const loadPopular = async () => {
     const response = await axios.get(`${API}/link/popular/${category.slug}`);
-    // console.log(response);
     setPopular(response.data);
   };
 
@@ -97,33 +73,69 @@ const Links = ({
 
   const listOfLinks = () =>
     allLinks.map((l, i) => (
-      <div key={i} className="row alert alert-primary p-2">
+      <div
+        key={i}
+        className="row alert p-3 mb-3"
+        style={{
+          backgroundColor: "rgba(251, 255, 228, 0.8)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "10px",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <div className="col-md-8" onClick={(e) => handleClick(l._id)}>
-          <a href={l.url} target="_blank">
-            <h5 className="pt-2">{l.title}</h5>
-            <h6 className="pt-2 text-danger" style={{ fontSize: "12px" }}>
+          <a
+            href={l.url}
+            target="_blank"
+            style={{ textDecoration: "none", color: "#3D8D7A" }}
+          >
+            <h5 className="pt-2" style={{ fontWeight: "600" }}>
+              {l.title}
+            </h5>
+            <h6 className="pt-2" style={{ fontSize: "12px", color: "#A3D1C6" }}>
               {l.url}
             </h6>
           </a>
         </div>
         <div className="col-md-4 pt-2">
-          <span className="pull-right">
+          <span
+            className="pull-right"
+            style={{ color: "#3D8D7A", fontSize: "14px" }}
+          >
             {moment(l.createdAt).fromNow()} by {l.postedBy.name}
-          </span>
-          <br />
-          <span className="badge text-secondary pull-right">
-            {l.clicks} clicks
           </span>
         </div>
         <div className="col-md-12">
-          <span className="badge text-dark">
-            {l.type} / {l.medium}
+          <span
+            className="badge"
+            style={{
+              backgroundColor: "#B3D8A8",
+              color: "#3D8D7A",
+              marginRight: "5px",
+            }}
+          >
+            {l.type} {l.medium}
           </span>
           {l.categories.map((c, i) => (
-            <span key={i} className="badge text-success">
+            <span
+              key={i}
+              className="badge"
+              style={{
+                backgroundColor: "#FBFFE4",
+                color: "#3D8D7A",
+                marginRight: "5px",
+              }}
+            >
               {c.name}
             </span>
           ))}
+          <span
+            className="badge pull-right"
+            style={{ backgroundColor: "#A3D1C6", color: "#3D8D7A" }}
+          >
+            {l.clicks} clicks
+          </span>
         </div>
       </div>
     ));
@@ -147,32 +159,77 @@ const Links = ({
 
   const listOfPopularLinks = () =>
     popular.map((l, i) => (
-      <div key={i} className="row alert alert-secondary p-2">
-        <div className="col-md-8" onClick={() => handleClick(l._id)}>
-          <a href={l.url} target="_blank">
-            <h5 className="pt-2">{l.title}</h5>
-            <h6 className="pt-2 text-danger" style={{ fontSize: "12px" }}>
+      <div
+        key={i}
+        className="row alert p-3 mb-3"
+        style={{
+          backgroundColor: "rgba(251, 255, 228, 0.8)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "10px",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <div className="col-md-8">
+          <div
+            onClick={() => handleClick(l._id)}
+            style={{ cursor: "pointer", textDecoration: "none" }}
+          >
+            <a href={l.url} target="_blank" style={{ color: "#3D8D7A" }}>
+              <h5 className="pt-2" style={{ fontWeight: "600" }}>
+                {l.title}
+              </h5>
+            </a>
+            <h6
+              className="pt-2"
+              style={{
+                fontSize: "12px",
+                color: "#A3D1C6",
+                wordWrap: "break-word", // Forces long words to break and wrap
+                overflowWrap: "break-word",
+                wordBreak: "break-word" ,
+              }}
+            >
               {l.url}
             </h6>
-          </a>
+          </div>
         </div>
-
         <div className="col-md-4 pt-2">
-          <span className="pull-right">
+          <span
+            className="pull-right"
+            style={{ color: "#3D8D7A", fontSize: "14px" }}
+          >
             {moment(l.createdAt).fromNow()} by {l.postedBy.name}
           </span>
         </div>
-
         <div className="col-md-12">
-          <span className="badge text-dark">
+          <span
+            className="badge"
+            style={{
+              backgroundColor: "#B3D8A8",
+              color: "#3D8D7A",
+              marginRight: "5px",
+            }}
+          >
             {l.type} {l.medium}
           </span>
           {l.categories.map((c, i) => (
-            <span key={i} className="badge text-success">
+            <span
+              key={i}
+              className="badge"
+              style={{
+                backgroundColor: "#FBFFE4",
+                color: "#3D8D7A",
+                marginRight: "5px",
+              }}
+            >
               {c.name}
             </span>
           ))}
-          <span className="badge text-secondary pull-right">
+          <span
+            className="badge pull-right"
+            style={{ backgroundColor: "#A3D1C6", color: "#3D8D7A" }}
+          >
             {l.clicks} clicks
           </span>
         </div>

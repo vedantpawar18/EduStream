@@ -7,150 +7,200 @@ import { API } from '../config';
 import { isAuth } from '../helpers/auth';
 
 const Register = () => {
-    const [state, setState] = useState({
-        name: 'Chetak',
-        email: 'vedantpawar2104@gmail.com',
-        password: 'Vp@12345',
-        error: '',
-        success: '',
-        buttonText: 'Register',
-        loadedCategories: [],
-        categories: []
-    });
+  const [state, setState] = useState({
+    name: '',
+    email: '',
+    password: '',
+    error: '',
+    success: '',
+    buttonText: 'Register',
+    loadedCategories: [],
+    categories: []
+  });
 
-    const { name, email, password, error, success, buttonText, loadedCategories, categories } = state;
+  const { name, email, password, error, success, buttonText, loadedCategories, categories } = state;
 
-    useEffect(() => {
-        isAuth() && Router.push('/');
-    }, []);
+  useEffect(() => {
+    isAuth() && Router.push('/');
+  }, []);
 
-    // load categories when component mounts using useEffect
-    useEffect(() => {
-        loadCategories();
-    }, []);
+  // load categories when component mounts using useEffect
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
-    const loadCategories = async () => {
-        const response = await axios.get(`${API}/categories`);
-        setState({ ...state, loadedCategories: response.data });
-    };
+  const loadCategories = async () => {
+    const response = await axios.get(`${API}/categories`);
+    setState({ ...state, loadedCategories: response.data });
+  };
 
-    const handleToggle = c => () => {
-        // return the first index or -1
-        const clickedCategory = categories.indexOf(c);
-        const all = [...categories];
+  const handleToggle = c => () => {
+    const clickedCategory = categories.indexOf(c);
+    const all = [...categories];
 
-        if (clickedCategory === -1) {
-            all.push(c);
-        } else {
-            all.splice(clickedCategory, 1);
-        }
-        console.log('all >> categories', all);
-        setState({ ...state, categories: all, success: '', error: '' });
-    };
+    if (clickedCategory === -1) {
+      all.push(c);
+    } else {
+      all.splice(clickedCategory, 1);
+    }
 
-    // show categories > checkbox
-    const showCategories = () => {
-        return (
-            loadedCategories &&
-            loadedCategories.map((c, i) => (
-                <li className="list-unstyled" key={c._id}>
-                    <input type="checkbox" onChange={handleToggle(c._id)} className="mr-2" />
-                    <label className="form-check-label">{c.name}</label>
-                </li>
-            ))
-        );
-    };
+    setState({ ...state, categories: all, success: '', error: '' });
+  };
 
-    const handleChange = name => e => {
-        setState({ ...state, [name]: e.target.value, error: '', success: '', buttonText: 'Register' });
-    };
-
-    const handleSubmit = async e => {
-        e.preventDefault();
-        console.table({
-            name,
-            email,
-            password,
-            categories
-        });
-        setState({ ...state, buttonText: 'Registering' });
-        try {
-            const response = await axios.post(`${API}/register`, {
-                name,
-                email,
-                password,
-                categories
-            });
-            console.log(response);
-            setState({
-                ...state,
-                name: '',
-                email: '',
-                password: '',
-                buttonText: 'Submitted',
-                success: response.data.message
-            });
-        } catch (error) {
-            console.log(error);
-            setState({ ...state, buttonText: 'Register', error: error.response.data.error });
-        }
-    };
- 
-    const registerForm = () => (
-        <form onSubmit={handleSubmit}>
-            <div className="form-group">
-                <input
-                    value={name}
-                    onChange={handleChange('name')}
-                    type="text"
-                    className="form-control"
-                    placeholder="Type your name"
-                    required
-                />
-            </div>
-            <div className="form-group">
-                <input
-                    value={email}
-                    onChange={handleChange('email')}
-                    type="email"
-                    className="form-control"
-                    placeholder="Type your email"
-                    required
-                />
-            </div>
-            <div className="form-group">
-                <input
-                    value={password}
-                    onChange={handleChange('password')}
-                    type="password"
-                    className="form-control"
-                    placeholder="Type your password"
-                    required
-                />
-            </div>
-
-            <div className="form-group">
-                <label className="text-muted ml-4">Category</label>
-                <ul style={{ maxHeight: '100px', overflowY: 'scroll' }}>{showCategories()}</ul>
-            </div>
-
-            <div className="form-group">
-                <button className="btn btn-outline-warning">{buttonText}</button>
-            </div>
-        </form>
-    );
-
+  // show categories > checkbox
+  const showCategories = () => {
     return (
-        <Layout>
-            <div className="col-md-6 offset-md-3">
-                <h1>Register</h1>
-                <br />
-                {success && showSuccessMessage(success)}
-                {error && showErrorMessage(error)}
-                {registerForm()}
-            </div>
-        </Layout>
+      loadedCategories &&
+      loadedCategories.map((c, i) => (
+        <li className="list-unstyled" key={c._id}>
+          <input type="checkbox" onChange={handleToggle(c._id)} className="mr-2" />
+          <label className="form-check-label">{c.name}</label>
+        </li>
+      ))
     );
+  };
+
+  const handleChange = name => e => {
+    setState({ ...state, [name]: e.target.value, error: '', success: '', buttonText: 'Register' });
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setState({ ...state, buttonText: 'Registering' });
+    try {
+      const response = await axios.post(`${API}/register`, {
+        name,
+        email,
+        password,
+        categories
+      });
+      setState({
+        ...state,
+        name: '',
+        email: '',
+        password: '',
+        buttonText: 'Submitted',
+        success: response.data.message
+      });
+    } catch (error) {
+      setState({ ...state, buttonText: 'Register', error: error.response.data.error });
+    }
+  };
+
+  const registerForm = () => (
+    <form onSubmit={handleSubmit}>
+      <div className="form-group" style={{ marginBottom: '12px' }}>
+        <input
+          value={name}
+          onChange={handleChange('name')}
+          type="text"
+          className="form-control"
+          style={{
+            borderRadius: '8px',
+            padding: '12px',
+            backgroundColor: '#F7F7F7',
+            border: '1px solid #ddd',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+          }}
+          placeholder="Type your name"
+          required
+        />
+      </div>
+      <div className="form-group" style={{ marginBottom: '12px' }}>
+        <input
+          value={email}
+          onChange={handleChange('email')}
+          type="email"
+          className="form-control"
+          style={{
+            borderRadius: '8px',
+            padding: '12px',
+            backgroundColor: '#F7F7F7',
+            border: '1px solid #ddd',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+          }}
+          placeholder="Type your email"
+          required
+        />
+      </div>
+      <div className="form-group" style={{ marginBottom: '12px' }}>
+        <input
+          value={password}
+          onChange={handleChange('password')}
+          type="password"
+          className="form-control"
+          style={{
+            borderRadius: '8px',
+            padding: '12px',
+            backgroundColor: '#F7F7F7',
+            border: '1px solid #ddd',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+          }}
+          placeholder="Type your password"
+          required
+        />
+      </div>
+
+      <div className="form-group" style={{ marginBottom: '12px' }}>
+        <label
+          className="text-muted ml-4"
+          style={{
+            fontWeight: '500',
+            color: '#2C6A4B',
+          }}
+        >
+          Category
+        </label>
+        <ul
+          style={{
+            maxHeight: '150px',
+            overflowY: 'auto',
+            marginTop: '10px',
+            paddingLeft: '15px',
+          }}
+        >
+          {showCategories()}
+        </ul>
+      </div>
+
+      <div className="form-group">
+        <button
+          className="btn btn-primary btn-block"
+          style={{
+            backgroundColor: '#2C6A4B',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '8px',
+            fontWeight: '600',
+            transition: 'background-color 0.3s ease-in-out',
+          }}
+        >
+          {buttonText}
+        </button>
+      </div>
+    </form>
+  );
+
+  return (
+    <Layout>
+      <div className="col-md-6 offset-md-3" style={{ background: 'rgba(255, 255, 255, 0.8)', borderRadius: '12px', padding: '20px', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
+        <h1
+          style={{
+            color: '#2C6A4B',
+            fontWeight: '600',
+            fontSize: '30px',
+            textAlign: 'center',
+          }}
+        >
+          Register
+        </h1>
+        <br />
+        {success && showSuccessMessage(success)}
+        {error && showErrorMessage(error)}
+        {registerForm()}
+      </div>
+    </Layout>
+  );
 };
 
 export default Register;

@@ -122,7 +122,7 @@ const Create = ({ user, token }) => {
         </label>
       </div>
       <div>
-        <button className="btn btn-warning btn-block rounded-3 shadow-lg">
+        <button className="btn btn-primary">
           {buttonText}
         </button>
       </div>
@@ -145,6 +145,45 @@ const Create = ({ user, token }) => {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .container {
+          background-color: rgba(251, 255, 228, 0.8);
+          backdrop-filter: blur(10px);
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+          background-color: #3d8d7a;
+          border-color: #3d8d7a;
+        }
+
+        .btn-primary:hover {
+          background-color: #2a6c58;
+          border-color: #2a6c58;
+        }
+
+        .btn-warning {
+          background-color: #ffb74d;
+          border-color: #ffb74d;
+        }
+
+        .btn-warning:hover {
+          background-color: #ff9800;
+          border-color: #ff9800;
+        }
+
+        .text-primary {
+          color: #3d8d7a !important;
+        }
+      `}</style>
     </Layout>
   );
 };
