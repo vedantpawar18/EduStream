@@ -63,39 +63,59 @@ const Read = ({ user, token }) => {
 
   const listCategories = () =>
     categories.map((c, i) => (
-      <div key={i} className="col-md-6">
-        <div
-          className="bg-light p-3"
-          style={{
-            backgroundColor: "rgba(251, 255, 228, 0.8)",
-            backdropFilter: "blur(10px)",
-            borderRadius: "10px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          }}
+      <div key={i} className="col-lg-4 col-md-6 col-sm-12 mb-4">
+        <Link
+          style={{ textDecoration: "none" }}
+          href={`/admin/category/${c.slug}`}
         >
-          <div className="row">
-            <div className="col-md-3">
-              <img
-                src={c.image && c.image.url}
-                alt={c.name}
-                style={{
-                  width: "100px",
-                  height: "auto",
-                  borderRadius: "10px",
-                  objectFit: "cover",
-                }}
-              />
+          <div
+            className="p-3 h-100"
+            style={{
+              backgroundColor: "rgba(179, 216, 168, 0.8)",
+              backdropFilter: "blur(10px)",
+              borderRadius: "10px",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              cursor: "pointer",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+            }}
+          >
+            <div className="d-flex align-items-center">
+              <div className="flex-shrink-0">
+                <img
+                  src={c.image && c.image.url}
+                  alt={c.name}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "10px",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+              <div className="flex-grow-1 ms-3">
+                <h3
+                  style={{
+                    color: "#3D8D7A",
+                    fontWeight: "600",
+                    fontSize: "1.25rem",
+                  }}
+                >
+                  {c.name}
+                </h3>
+              </div>
             </div>
-            <div className="col-md-6">
-              <h3 style={{ color: "#3D8D7A", fontWeight: "600" }}>{c.name}</h3>
-            </div>
-            <div className="col-md-3">
+
+            {/* Buttons inside the card */}
+            <div className="d-flex justify-content-between mt-3">
               <Link href={`/admin/category/${c.slug}`}>
                 <button
-                  className="btn btn-sm btn-outline-success btn-block mb-1"
+                  className="btn btn-sm btn-outline-success"
                   style={{
                     color: "#3D8D7A",
                     borderColor: "#3D8D7A",
+                    fontWeight: "600",
+                    padding: "8px 15px",
                     transition: "background-color 0.3s, color 0.3s",
                   }}
                 >
@@ -105,10 +125,12 @@ const Read = ({ user, token }) => {
 
               <button
                 onClick={(e) => confirmDelete(e, c.slug)}
-                className="btn btn-sm btn-outline-danger btn-block"
+                className="btn btn-sm btn-outline-danger"
                 style={{
                   color: "#f44336",
                   borderColor: "#f44336",
+                  fontWeight: "600",
+                  padding: "8px 15px",
                   transition: "background-color 0.3s, color 0.3s",
                 }}
               >
@@ -116,7 +138,7 @@ const Read = ({ user, token }) => {
               </button>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     ));
 
@@ -134,7 +156,10 @@ const Read = ({ user, token }) => {
             {error && (
               <div
                 className="alert alert-danger"
-                style={{ borderRadius: "8px" }}
+                style={{
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                }}
               >
                 {error}
               </div>
@@ -142,7 +167,10 @@ const Read = ({ user, token }) => {
             {success && (
               <div
                 className="alert alert-success"
-                style={{ borderRadius: "8px" }}
+                style={{
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                }}
               >
                 {success}
               </div>

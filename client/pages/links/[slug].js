@@ -93,7 +93,16 @@ const Links = ({
             <h5 className="pt-2" style={{ fontWeight: "600" }}>
               {l.title}
             </h5>
-            <h6 className="pt-2" style={{ fontSize: "12px", color: "#A3D1C6" }}>
+            <h6
+              className="pt-2"
+              style={{
+                fontSize: "12px",
+                color: "#A3D1C6",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+              }}
+            >
               {l.url}
             </h6>
           </a>
@@ -185,9 +194,9 @@ const Links = ({
               style={{
                 fontSize: "12px",
                 color: "#A3D1C6",
-                wordWrap: "break-word", // Forces long words to break and wrap
+                wordWrap: "break-word",
                 overflowWrap: "break-word",
-                wordBreak: "break-word" ,
+                wordBreak: "break-word",
               }}
             >
               {l.url}

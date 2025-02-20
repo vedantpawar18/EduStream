@@ -90,20 +90,22 @@ const Create = ({ token }) => {
   const showTypes = () => (
     <>
       {["free", "paid"].map((typeOption) => (
-        <div className="form-check ml-3" key={typeOption}>
-          <input
-            type="radio"
-            onChange={() =>
-              handleChange({ target: { value: typeOption } }, "type")
-            }
-            checked={type === typeOption}
-            value={typeOption}
-            className="form-check-input"
-            name="type"
-          />
-          <label className="form-check-label">
-            {typeOption.charAt(0).toUpperCase() + typeOption.slice(1)}
-          </label>
+        <div className="col-lg-3 col-md-4 col-sm-6 mb-3" key={typeOption}>
+          <div className="form-check">
+            <input
+              type="radio"
+              onChange={() =>
+                handleChange({ target: { value: typeOption } }, "type")
+              }
+              checked={type === typeOption}
+              value={typeOption}
+              className="form-check-input"
+              name="type"
+            />
+            <label className="form-check-label">
+              {typeOption.charAt(0).toUpperCase() + typeOption.slice(1)}
+            </label>
+          </div>
         </div>
       ))}
     </>
@@ -112,20 +114,22 @@ const Create = ({ token }) => {
   const showMedium = () => (
     <>
       {["video", "book"].map((mediumOption) => (
-        <div className="form-check ml-3" key={mediumOption}>
-          <input
-            type="radio"
-            onChange={() =>
-              handleChange({ target: { value: mediumOption } }, "medium")
-            }
-            checked={medium === mediumOption}
-            value={mediumOption}
-            className="form-check-input"
-            name="medium"
-          />
-          <label className="form-check-label">
-            {mediumOption.charAt(0).toUpperCase() + mediumOption.slice(1)}
-          </label>
+        <div className="col-lg-3 col-md-4 col-sm-6 mb-3" key={mediumOption}>
+          <div className="form-check">
+            <input
+              type="radio"
+              onChange={() =>
+                handleChange({ target: { value: mediumOption } }, "medium")
+              }
+              checked={medium === mediumOption}
+              value={mediumOption}
+              className="form-check-input"
+              name="medium"
+            />
+            <label className="form-check-label">
+              {mediumOption.charAt(0).toUpperCase() + mediumOption.slice(1)}
+            </label>
+          </div>
         </div>
       ))}
     </>
@@ -133,47 +137,44 @@ const Create = ({ token }) => {
 
   const renderCategories = () =>
     loadedCategories.map((c) => (
-      <li className="list-unstyled" key={c._id}>
-        <input
-          type="checkbox"
-          onChange={handleCategoryToggle(c._id)}
-          className="mr-2"
-          checked={categories.includes(c._id)}
-        />
-        <label className="form-check-label">{c.name}</label>
-      </li>
+      <div className="col-lg-3 col-md-4 col-sm-6 mb-3" key={c._id}>
+        <div className="form-check">
+          <input
+            type="checkbox"
+            onChange={handleCategoryToggle(c._id)}
+            className="form-check-input"
+            checked={categories.includes(c._id)}
+          />
+          <label className="form-check-label">{c.name}</label>
+        </div>
+      </div>
     ));
 
   return (
     <Layout>
-      <div className="row">
-        <div className="col-md-12">
-          <h1>Submit Link/URL</h1>
-          <br />
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-md-4">
-          <div className="form-group">
-            <label className="text-muted">Category</label>
-            <ul style={{ maxHeight: "150px", overflowY: "auto" }}>
-              {renderCategories()}
-            </ul>
-          </div>
-
-          <div className="form-group">
-            <label className="text-muted">Type</label>
-            {showTypes()}
-          </div>
-
-          <div className="form-group">
-            <label className="text-muted">Medium</label>
-            {showMedium()}
-          </div>
-        </div>
-
+      <div
+        className="row justify-content-center"
+        style={{
+          background: "rgba(255, 255, 255, 0.2)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "15px",
+          padding: "30px",
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+          transition: "all 0.3s",
+        }}
+      >
         <div className="col-md-8">
+          <h1
+            style={{
+              color: "#2C6A4B",
+              fontSize: "32px",
+              fontWeight: "600",
+              textAlign: "center",
+            }}
+          >
+            Submit Link/URL
+          </h1>
+          <br />
           {success && showSuccessMessage(success)}
           {error && showErrorMessage(error)}
           <form onSubmit={handleSubmit}>
@@ -184,6 +185,13 @@ const Create = ({ token }) => {
                 className="form-control"
                 value={title}
                 onChange={(e) => handleChange(e, "title")}
+                style={{
+                  padding: "15px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  marginBottom: "15px",
+                  fontSize: "16px",
+                }}
               />
             </div>
             <div className="form-group">
@@ -193,12 +201,53 @@ const Create = ({ token }) => {
                 className="form-control"
                 value={url}
                 onChange={(e) => handleChange(e, "url")}
+                style={{
+                  padding: "15px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  marginBottom: "15px",
+                  fontSize: "16px",
+                }}
               />
             </div>
+
+            <div className="row">
+              <div className="col-12">
+                <div className="form-group">
+                  <label className="text-muted">Category</label>
+                  <div className="row">{renderCategories()}</div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-12">
+                  <div className="form-group">
+                    <label className="text-muted">Type</label>
+                    <div className="row">{showTypes()}</div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="text-muted">Medium</label>
+                    <div className="row">{showMedium()}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button
               disabled={!token}
               className="btn btn-outline-warning"
               type="submit"
+              style={{
+                width: "100%",
+                padding: "12px",
+                backgroundColor: "#2C6A4B",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "16px",
+                transition: "all 0.3s",
+              }}
             >
               {isAuth() || token ? "Post" : "Login to post"}
             </button>

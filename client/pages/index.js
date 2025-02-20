@@ -44,7 +44,16 @@ const Home = ({ categories }) => {
             <h5 className="pt-2" style={{ fontWeight: "600" }}>
               {l.title}
             </h5>
-            <h6 className="pt-2" style={{ fontSize: "12px", color: "#A3D1C6" }}>
+            <h6
+              className="pt-2"
+              style={{
+                fontSize: "12px",
+                color: "#A3D1C6",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                wordBreak: "break-word",
+              }}
+            >
               {l.url}
             </h6>
           </a>
@@ -96,7 +105,7 @@ const Home = ({ categories }) => {
   const listCategories = () =>
     categories.map((c, i) => (
       <div key={i} className="col-lg-4 col-md-6 col-sm-12 mb-4">
-        <Link href={`/links/${c.slug}`}>
+        <Link style={{ textDecoration: "none" }} href={`/links/${c.slug}`}>
           <div
             className="p-3 h-100"
             style={{

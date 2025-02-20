@@ -1,13 +1,13 @@
 import Layout from "../../components/Layout";
 import withAdmin from "../withAdmin";
 import Link from "next/link";
-import { FaCog, FaPlusCircle } from "react-icons/fa";  
+import { FaCog, FaPlusCircle } from "react-icons/fa";
 
 const Admin = ({ user }) => (
   <Layout>
     <h1 className="text-center my-2">Admin Dashboard</h1>
 
-    <div className="row mt-2"> 
+    <div className="row mt-2">
       <div className="col-md-3">
         <div
           className="card shadow-sm"
@@ -55,7 +55,7 @@ const Admin = ({ user }) => (
           </div>
         </div>
       </div>
- 
+
       <div className="col-md-9">
         <div
           className="card shadow-sm"
@@ -71,15 +71,20 @@ const Admin = ({ user }) => (
             <h4 className="card-title" style={{ fontWeight: "600" }}>
               Welcome, {user ? user.name : "Admin"}
             </h4>
-            <p className="card-text" style={{ fontSize: "14px", color: "#A3D1C6" }}>
+            <p
+              className="card-text"
+              style={{ fontSize: "14px", color: "#A3D1C6" }}
+            >
               Here you can manage categories, settings, and more.
-            </p> 
-            <button className="btn btn-primary">Create New Category</button>
+            </p>
+            <Link href="/admin/category/create">
+              <button className="btn btn-primary">Create New Category</button>
+            </Link>
           </div>
         </div>
       </div>
     </div>
- 
+
     <style jsx>{`
       .nav-link {
         word-wrap: break-word;
@@ -93,18 +98,18 @@ const Admin = ({ user }) => (
       }
 
       .card-text {
-        color: #A3D1C6;
+        color: #a3d1c6;
         font-size: 14px;
       }
 
       .btn-primary {
-        background-color: #3D8D7A;
-        border-color: #3D8D7A;
+        background-color: #3d8d7a;
+        border-color: #3d8d7a;
       }
 
       .btn-primary:hover {
-        background-color: #2A6C58;
-        border-color: #2A6C58;
+        background-color: #2a6c58;
+        border-color: #2a6c58;
       }
     `}</style>
   </Layout>

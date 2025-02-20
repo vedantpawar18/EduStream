@@ -77,7 +77,7 @@ const Update = ({ oldCategory, token }) => {
     } catch (error) {
       setState({
         ...state,
-        buttonText: "Create",
+        buttonText: "Update",
         error: error.response.data.error,
       });
     }
@@ -85,32 +85,32 @@ const Update = ({ oldCategory, token }) => {
 
   const updateCategoryForm = () => (
     <form onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label className="text-muted">Name</label>
+      <div className="form-group mb-4">
+        <label className="text-muted">Category Name</label>
         <input
           onChange={handleChange("name")}
           value={name}
           type="text"
-          className="form-control"
+          className="form-control input-lg rounded-3 shadow-sm"
+          placeholder="Enter category name"
           required
         />
       </div>
-      <div className="form-group">
-        <label className="text-muted">Content</label>
+      <div className="form-group mb-4">
+        <label className="text-muted">Category Content</label>
         <ReactQuill
           value={content}
           onChange={handleContent}
           placeholder="Write something..."
           theme="bubble"
           className="pb-5 mb-3"
-          style={{ border: "1px solid #666" }}
+          style={{ border: "1px solid #666", borderRadius: "8px" }}
         />
       </div>
-      <div className="form-group">
-        <label className="btn btn-outline-secondary">
-          {imageUploadButtonName}{" "}
+      <div className="form-group mb-4">
+        <label className="btn btn-outline-secondary rounded-3 p-3 shadow-sm">
           <span>
-            <img src={imagePreview} alt="image" height="20" />
+            <img src={imagePreview} alt="image" height="30" />
           </span>
           <input
             onChange={handleImage}
@@ -119,12 +119,13 @@ const Update = ({ oldCategory, token }) => {
             className="form-control"
             hidden
           />
+          {imageUploadButtonName}
         </label>
       </div>
-      <div>
+      <div className="mb-4">
         <button
-          style={{ backgroundColor: "#3D8D7A", borderColor: " #3D8D7A", marginTop:"14px" }}
-          className="btn "
+          style={{ backgroundColor: "#3D8D7A" }}
+          className="btn btn-primary"
         >
           {buttonText}
         </button>
@@ -134,28 +135,59 @@ const Update = ({ oldCategory, token }) => {
 
   return (
     <Layout>
-      <div className="row">
-        <div className="col-md-6 offset-md-3">
-          <div
-            className="card shadow-sm"
-            style={{
-              backgroundColor: "rgba(251, 255, 228, 0.8)",
-              backdropFilter: "blur(10px)",
-              borderRadius: "10px",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <div className="card-body">
-              <h1 className="card-title text-center">Update Category</h1>
-              <br />
-              {success && showSuccessMessage(success)}
-              {error && showErrorMessage(error)}
-              {updateCategoryForm()}
-            </div>
+      <div className="container mt-5">
+        <div className="row justify-content-center">
+          <div className="col-md-8">
+            <h1 className="font-weight-bold text-center text-primary mb-4">
+              Update Category
+            </h1>
+
+            {success && showSuccessMessage(success)}
+            {error && showErrorMessage(error)}
+
+            {updateCategoryForm()}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .container {
+          background-color: rgba(251, 255, 228, 0.8);
+          backdrop-filter: blur(10px);
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+          background-color: #3d8d7a;
+          border-color: #3d8d7a;
+        }
+
+        .btn-primary:hover {
+          background-color: #2a6c58;
+          border-color: #2a6c58;
+        }
+
+        .btn-warning {
+          background-color: #ffb74d;
+          border-color: #ffb74d;
+        }
+
+        .btn-warning:hover {
+          background-color: #ff9800;
+          border-color: #ff9800;
+        }
+
+        .text-primary {
+          color: #3d8d7a !important;
+        }
+      `}</style>
     </Layout>
   );
 };
