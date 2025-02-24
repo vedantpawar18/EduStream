@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          backgroundColor: "#FBFFE4",
+          backgroundColor: "#fff",
           overflow: "hidden",
         }}
       >
