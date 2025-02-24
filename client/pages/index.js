@@ -28,7 +28,6 @@ const Home = ({ categories }) => {
         key={i}
         className="row alert p-3 mb-3"
         style={{
-          backgroundColor: "rgba(251, 255, 228, 0.8)",
           backdropFilter: "blur(10px)",
           borderRadius: "10px",
           border: "1px solid rgba(255, 255, 255, 0.2)",
