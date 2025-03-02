@@ -1,6 +1,7 @@
 # EduStream
 EduStream is a platform where users can register and submit relevant links under various categories such as React, PHP, and more. Admins can create categories, and manage links submitted by users. Registered users can add, update, or delete their links, while regular users can view all the links, their click counts, and the trending links. A confirmation email is sent to users upon registration using Nodemailer or AWS SES.
-![votek](https://user-images.githubusercontent.com/101568818/232305827-3354019c-2060-41cd-bafb-4956c1805858.png)
+![Screenshot (814)](https://github.com/user-attachments/assets/d4c85aed-eed4-4c55-85a5-08b448c94fae)
+
 
 # Step to cloning repo
 
@@ -31,35 +32,47 @@ $ cd ..
 
 
 # Tech-Stack used : 
-![home](https://img.shields.io/badge/html-FF4154?style=for-the-badge&logo=React&logoColor=white)
-![home](https://img.shields.io/badge/css-F26B00?style=for-the-badge&logo=NextJs&logoColor=white)
-![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=Bootstrap&logoColor=white)
-![home](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=React Redux&logoColor=white) 
-![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=Node.js&logoColor=white)
-![home](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=Express&logoColor=white) 
-![home](https://img.shields.io/badge/JSS-F7DF1E?style=for-the-badge&logo=JSS&logoColor=white)
-![home](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
-![home](https://img.shields.io/badge/git-000000?style=for-the-badge&logo=Git&logoColor=white)
-![mongoDB](https://img.shields.io/badge/MongoDB-43B02A?style=for-the-badge&logo=MongoDB&logoColor=white)
-![Nodemailer](https://img.shields.io/badge/Nodemailer-000000?style=for-the-badge&logo=npm&logoColor=white)
-![AWS SES](https://img.shields.io/badge/AWS%20SES-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+### Frontend:
+![ReactJS](https://img.shields.io/badge/ReactJS-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)  
+![NextJS](https://img.shields.io/badge/NextJS-000000?style=for-the-badge&logo=next.js&logoColor=white)  
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)  
+![React Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
+
+### Backend:
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)  
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)  
+![MongoDB](https://img.shields.io/badge/MongoDB-43B02A?style=for-the-badge&logo=MongoDB&logoColor=white)  
+![Nodemailer](https://img.shields.io/badge/Nodemailer-000000?style=for-the-badge&logo=npm&logoColor=white)  
+![AWS SES](https://img.shields.io/badge/AWS%20SES-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)  
 ![AWS S3](https://img.shields.io/badge/AWS%20S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
-![home](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white) 
-![home](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) 
-![home](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
-![Nodemon](https://img.shields.io/badge/NODEMON-%23323330.svg?style=for-the-badge&logo=nodemon&logoColor=%BBDEAD)
-![home](https://img.shields.io/badge/Postman-FF4154?style=for-the-badge&logo=Postman&logoColor=white)
-![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
-![PM2](https://img.shields.io/badge/PM2-2F353B?style=for-the-badge&logo=pm2&logoColor=white)
+
+### Deployment:
+![AWS EC2](https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)  
+![PM2](https://img.shields.io/badge/PM2-2F353B?style=for-the-badge&logo=pm2&logoColor=white)  
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 
+### Frontend:
+- **ReactJS**
+- **NextJS**
+- **Bootstrap**
+- **React Redux**
 
-### Frontend : ReactJS NextJS, Bootstrap, React Redux
-### Backend : Node.js, Express.js, MongoDB, Nodemailer, AWS SES, AWS S3
-### Deployment : AWS EC2, PM2, Nginx
+### Backend:
+- **Node.js**
+- **Express.js**
+- **MongoDB**
+- **Nodemailer**
+- **AWS SES**
+- **AWS S3**
+
+### Deployment:
+- **AWS EC2**
+- **PM2**
+- **Nginx**
+
 
 # Features 
-
 ### Admin Features:
 Create, delete, and update categories (e.g., React, PHP)
 Manage links submitted by users (add, delete, update)
@@ -98,3 +111,10 @@ Allows users to add, update, or delete their links.
 ## Feedback: 
 If you have any feedback, any suggestion please reach out to us at 
 vedantpawar18@gmail.com
+
+
+
+
+
+
+
