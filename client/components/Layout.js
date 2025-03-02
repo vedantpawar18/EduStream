@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          backgroundColor: "#FBFFE4",
+          backgroundColor: "#fff",
           overflow: "hidden",
         }}
       >
@@ -152,7 +152,7 @@ const Layout = ({ children }) => {
           style={{
             flex: 1,
             padding: "40px 20px",
-            backgroundColor: "rgba(251, 255, 228, 0.85)",
+            backgroundColor: "rgba(0, 0, 0, 0)",
             backdropFilter: "blur(15px)",
             boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
             border: "1px solid rgba(255, 255, 255, 0.2)",
