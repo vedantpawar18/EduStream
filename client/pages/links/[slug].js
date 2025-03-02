@@ -71,10 +71,14 @@ const Links = ({
     setAllLinks(response.data.links);
   };
 
-  const listOfLinks = () =>
-    allLinks.map((l, i) => (
+  const listOfLinks = () => {
+    const uniqueLinks = Array.from(
+      new Set(allLinks.map((link) => link._id))
+    ).map((id) => allLinks.find((link) => link._id === id));
+
+    return uniqueLinks.map((l, i) => (
       <div
-        key={i}
+        key={l._id}
         className="row alert p-3 mb-3"
         style={{
           backgroundColor: "rgba(251, 255, 228, 0.8)",
@@ -126,9 +130,9 @@ const Links = ({
           >
             {l.type} {l.medium}
           </span>
-          {l.categories.map((c, i) => (
+          {l.categories.map((c, index) => (
             <span
-              key={i}
+              key={index}
               className="badge"
               style={{
                 backgroundColor: "#FBFFE4",
@@ -148,6 +152,7 @@ const Links = ({
         </div>
       </div>
     ));
+  };
 
   const loadMore = async () => {
     setLoading(true);

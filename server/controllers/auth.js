@@ -1,4 +1,4 @@
-const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const {
@@ -10,17 +10,18 @@ const expressJwt = require("express-jwt");
 const _ = require("lodash");
 const Link = require("../models/link");
 
-const sesClient = new SESClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  secure: true,
+  port: 465,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 exports.register = async (req, res) => {
   const { name, email, password, categories } = req.body;
-
   try {
     const user = await User.findOne({ email });
     if (user) {
@@ -36,17 +37,32 @@ exports.register = async (req, res) => {
         expiresIn: "10m",
       }
     );
-    const params = registerEmailParams(email, token);
-    const sendEmailCommand = new SendEmailCommand(params);
-    const data = await sesClient.send(sendEmailCommand);
-    console.log("Email submitted to SES", data);
-    res.json({
-      message: `Email has been sent to ${email}, Follow the instructions to complete your registration`,
+    const emailParams = registerEmailParams(email, token);
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: emailParams.subject,
+      html: emailParams.html,
+    };
+
+    // Sending the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error sending email:", error);
+        return res.status(500).json({
+          message: "We could not send the email. Please try again.",
+        });
+      }
+      console.log("Email sent: " + info.response);
+      res.json({
+        message: `Email has been sent to ${email}. Follow the instructions to complete your registration.`,
+      });
     });
   } catch (error) {
     console.log("Error during registration:", error);
     res.json({
-      message: `We could not verify your email. Please try again`,
+      message: "We could not verify your email. Please try again",
     });
   }
 };
@@ -195,13 +211,29 @@ exports.forgotPassword = async (req, res) => {
       process.env.JWT_RESET_PASSWORD,
       { expiresIn: "10m" }
     );
-    const params = forgotPasswordEmailParams(email, token);
+    const emailParams = forgotPasswordEmailParams(email, token);
+
     await user.updateOne({ resetPasswordLink: token });
-    const sendEmailCommand = new SendEmailCommand(params);
-    const data = await sesClient.send(sendEmailCommand);
-    console.log("Email submitted to SES", data);
-    res.json({
-      message: `Email has been sent to ${email}. Follow the instructions to reset your password.`,
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: emailParams.subject,
+      html: emailParams.html,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error sending email:", error);
+        return res.status(500).json({
+          message:
+            "We could not process your password reset. Please try again later.",
+        });
+      }
+      console.log("Email sent: " + info.response);
+      res.json({
+        message: `Email has been sent to ${email}. Follow the instructions to reset your password.`,
+      });
     });
   } catch (error) {
     console.log("Error during password reset:", error);

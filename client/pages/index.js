@@ -164,7 +164,7 @@ const Home = ({ categories }) => {
         <div className="row pt-5">
           <div className="col-md-12">
             <h2 className="font-weight-bold pb-3" style={{ color: "#3D8D7A" }}>
-              Trending {popular.length}
+              Trending Links
             </h2>
             {listOfLinks()}
           </div>

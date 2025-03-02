@@ -2,20 +2,19 @@ const Link = require("../models/link");
 const User = require("../models/user");
 const Category = require("../models/category");
 const { linkPublishedParams } = require("../helpers/email");
-const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const nodemailer = require("nodemailer");
 
-const sesClient = new SESClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
 exports.create = async (req, res) => {
   const { title, url, categories, type, medium } = req.body;
   const slug = url;
-
   try {
     const newLink = new Link({
       title,
@@ -31,20 +30,23 @@ exports.create = async (req, res) => {
     res.json(savedLink);
 
     const users = await User.find({ categories: { $in: categories } }).exec();
-
     const categoryDetails = await Category.find({
       _id: { $in: categories },
     }).exec();
 
     savedLink.categories = categoryDetails;
-
     for (const user of users) {
       const params = linkPublishedParams(user.email, savedLink);
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: params.subject,
+        html: params.html,
+      };
 
       try {
-        const sendEmailCommand = new SendEmailCommand(params);
-        const emailResult = await sesClient.send(sendEmailCommand);
-        console.log("Email sent successfully:", emailResult);
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully to:", user.email, info.response);
       } catch (error) {
         console.error("Error sending email to", user.email, error);
       }
@@ -150,13 +152,12 @@ exports.clickCount = async (req, res) => {
   }
 };
 
- 
 exports.popular = async (req, res) => {
   try {
     const links = await Link.find()
       .populate("postedBy", "name")
       .sort({ clicks: -1 })
-      .limit(3); 
+      .limit(3);
 
     res.json(links);
   } catch (err) {
@@ -165,7 +166,6 @@ exports.popular = async (req, res) => {
     });
   }
 };
-
 
 exports.popularInCategory = async (req, res) => {
   const { slug } = req.params;
